@@ -11,6 +11,21 @@
       "item": [
         {
           "name": "Get Booking IDs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -41,7 +56,22 @@
                 "exec": [
                   "var jsonData = pm.response.json();\r",
                   "pm.environment.set(\"b_id\", jsonData.bookingid);\r",
-                  ""
+                  "\r",
+                  "pm.test(\"Verify Status code is 200\", function () {       // Validate Status Code is 200 or not.\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify Body matches string\", function () {         //Validation is Output conatins \"Philip\"\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Philip\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify Content-Type is present\", function () {\r",
+                  "    pm.response.to.have.header(\"Content-Type\",\"application/json; charset=utf-8\");  // Validate with header\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify Response time is less than 200ms\", function () {  //Verify Response time\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -87,12 +117,55 @@
         },
         {
           "name": "Get Booking Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "var jsonData = pm.response.json();\r",
+                  "pm.test(\"Verify first name\", function () {\r",
+                  "    pm.expect(jsonData.firstname).to.eql(\"Philip\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify total Price\", function () {\r",
+                  "    pm.expect(jsonData.totalprice).to.eql(1000);\r",
+                  "});\r",
+                  "pm.test(\"Verify Checkin Date\", function () {\r",
+                  "    pm.expect(jsonData.bookingdates.checkin).to.eql(\"2026-02-01\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify Checkout Date\", function () {\r",
+                  "    pm.expect(jsonData.bookingdates.checkout).to.eql(\"2026-02-05\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "auth": {
               "type": "noauth"
             },
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "https://restful-booker.herokuapp.com/booking/{{b_id}}",
               "protocol": "https",
@@ -117,7 +190,11 @@
               "script": {
                 "exec": [
                   "var jsonData = pm.response.json();\r",
-                  "pm.environment.set(\"b_token\", jsonData.token);"
+                  "pm.environment.set(\"b_token\", jsonData.token);\r",
+                  "\r",
+                  "pm.test(\"Verify Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -158,6 +235,21 @@
         },
         {
           "name": "Update Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Verify Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -202,6 +294,21 @@
         },
         {
           "name": "Delete Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Verify Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [
@@ -217,7 +324,7 @@
               }
             ],
             "url": {
-              "raw": "https://restful-booker.herokuapp.com/booking/2895",
+              "raw": "https://restful-booker.herokuapp.com/booking/{{b_id}}",
               "protocol": "https",
               "host": [
                 "restful-booker",
@@ -226,18 +333,33 @@
               ],
               "path": [
                 "booking",
-                "2895"
+                "{{b_id}}"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "https://restful-booker.herokuapp.com/booking",
+          "name": "CURL Command Imports",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(202);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [
               {
@@ -247,7 +369,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"firstname\": \"Mike\",\r\n\"lastname\": \"Joshnson\",\r\n\"totalprice\": 111,\r\n\"depositpaid\": true,\r\n\"bookingdates\": {\r\n    \"checkin\": \"2018-01-01\",\r\n    \"checkout\": \"2019-01-01\"\r\n    },\r\n    \r\n    \"additionalneeds\": \"Breakfast\"}",
+              "raw": "{\r\n  \"firstname\": \"Philip\",\r\n  \"lastname\": \"Boyle\",\r\n  \"totalprice\": 1000,\r\n  \"depositpaid\": true,\r\n  \"bookingdates\": {\r\n    \"checkin\": \"2026-02-01\",\r\n    \"checkout\": \"2026-02-05\"\r\n  },\r\n  \"additionalneeds\": \"Breakfast\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -265,7 +387,8 @@
               "path": [
                 "booking"
               ]
-            }
+            },
+            "description": "Generated from cURL: curl --location 'https://restful-booker.herokuapp.com/booking' \\\r\n--header 'Content-Type: application/json' \\\r\n--data '{\r\n  \"firstname\": \"Philip\",\r\n  \"lastname\": \"Boyle\",\r\n  \"totalprice\": 1000,\r\n  \"depositpaid\": true,\r\n  \"bookingdates\": {\r\n    \"checkin\": \"2026-02-01\",\r\n    \"checkout\": \"2026-02-05\"\r\n  },\r\n  \"additionalneeds\": \"Breakfast\"\r\n}'"
           },
           "response": []
         }
@@ -276,6 +399,21 @@
       "item": [
         {
           "name": "Get Booking Details Invalid Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -283,7 +421,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "https://restful-booker.herokuapp.com/booking/951",
+              "raw": "https://restful-booker.herokuapp.com/booking/2200",
               "protocol": "https",
               "host": [
                 "restful-booker",
@@ -292,7 +430,7 @@
               ],
               "path": [
                 "booking",
-                "951"
+                "2200"
               ]
             }
           },
@@ -300,6 +438,21 @@
         },
         {
           "name": "Create Booking Invalid Chars",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
